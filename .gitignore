@@ -3,3 +3,5 @@
 lexicons.egg-info/
 /log/
 /node_modules/
+/build/
+/dist/

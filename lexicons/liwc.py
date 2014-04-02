@@ -100,9 +100,11 @@ class Liwc(Lexicon):
         result.update(counts)
         return result
 
-    def print_summarization(self, counts):
+    def scale_summary(self, counts):
         absolutes = ['%d' % counts['WC'], '%0.2f' % counts['WPS']]
         percentages = ['%0.2f' % (counts[key] * 100) for key in self.all_keys[2:]]
+        return dict(zip(self.all_keys, absolutes + percentages))
 
-        for key, value in zip(self.all_keys, absolutes + percentages):
+    def print_summarization(self, counts):
+        for key, value in self.scale_summary(counts).items():
             print '%16s %s' % (key, value)
