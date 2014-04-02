@@ -64,16 +64,16 @@ Pull the `scala/lexicons.scala` file into your codebase, and run something like:
 
 For the purpose of using `dict2trie.py`, LIWC may ship with a broken English dictionary.  The MD5 of the broken dictionary is `1d964b7fbf218effd6aa652303e15e9e`. One solution is to patch the dictionary before converting to a trie.  The process might look something like this:
 
-  cp /Applications/LIWC2007/Dictionaries/LIWC2007_English100131.dic /usr/local/data
-  cp liwc_english_fix1.patch /usr/local/data
-  cd /usr/local/data
-  patch < liwc_english_fix1.patch
-  python lexicons/dic2trie.py < LIWC2007_English100131.dic > liwc_2007.trie
+    cp /Applications/LIWC2007/Dictionaries/LIWC2007_English100131.dic /usr/local/data
+    cp liwc_english_fix1.patch /usr/local/data
+    cd /usr/local/data
+    patch < liwc_english_fix1.patch
+    python lexicons/dic2trie.py < LIWC2007_English100131.dic > liwc_2007.trie
 
 Afterwards, you can adopt the usual workflow:
 
-  from lexicons.liwc import Liwc
-  liwc = Liwc()
-  with open('/tmp/sample.txt', 'r') as document:
-    summary = liwc.summarize_document(document.read())
-    liwc.print_summarization(summary)
+    from lexicons.liwc import Liwc
+    liwc = Liwc()
+    with open('/tmp/sample.txt', 'r') as document:
+        summary = liwc.summarize_document(document.read())
+        liwc.print_summarization(summary)
