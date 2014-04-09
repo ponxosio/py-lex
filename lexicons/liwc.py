@@ -93,7 +93,10 @@ class Liwc(Lexicon):
         if normalize:
             # normalize all counts but the first two ('WC' and 'WPS')
             for column in self.all_keys[2:]:
-                counts[column] = float(counts[column]) / float(counts['WC'])
+                if counts['WC']>0:
+                    counts[column] = float(counts[column]) / float(counts['WC'])
+                else:
+                    counts[column] = 0.0
 
         # return a normal dict() rather than the Counter() instance
         result = dict.fromkeys(self.category_keys + ['Dic'], 0)
@@ -101,10 +104,10 @@ class Liwc(Lexicon):
         return result
 
     def scale_summary(self, counts):
-        absolutes = ['%d' % counts['WC'], '%0.2f' % counts['WPS']]
-        percentages = ['%0.2f' % (counts[key] * 100) for key in self.all_keys[2:]]
+        absolutes = [counts['WC'], counts['WPS']]
+        percentages = [counts[key] * 100 for key in self.all_keys[2:]]
         return dict(zip(self.all_keys, absolutes + percentages))
 
     def print_summarization(self, counts):
         for key, value in self.scale_summary(counts).items():
-            print '%16s %s' % (key, value)
+            print '%16s %0.2f' % (key, value)
