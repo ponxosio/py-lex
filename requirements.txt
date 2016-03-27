@@ -1,1 +1,2 @@
 marisa-trie==0.7.2
+bidict==0.11.0
