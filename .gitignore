@@ -1,7 +1,9 @@
 .DS_Store
 *.pyc
+*.bak
 lexicons.egg-info/
 /log/
 /node_modules/
 /build/
 /dist/
+/py_lex/archive

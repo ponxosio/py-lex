@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import re
 from lexicons.base import Lexicon
 from collections import Counter
@@ -86,7 +87,7 @@ class Liwc2():
         * stems_to_categories dict(Stem: Set())
     '''
     def parse(self, liwc_lines):
-        print liwc_lines[:70]
+        print(liwc_lines[:70])
         start, end = self._get_category_indices(liwc_lines)
         categories, stems = self._get_category_and_stem_lines(liwc_lines)
 
