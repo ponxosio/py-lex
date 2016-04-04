@@ -51,8 +51,6 @@ class LiwcParser(object):
         self.direct_lookup_stems,
         self.stem_search_trie) = self._parse(liwc_lines)
 
-        print(self.category_bidict, self.stem_to_categories, self.direct_lookup_stems, self.stem_search_trie)
-
     '''
     len(self)
     -> int

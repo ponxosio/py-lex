@@ -6,3 +6,5 @@ PYTHONSTARTUP='./config.py' ipython
 
 import py_lex
 from py_lex import Liwc, LiwcParser
+
+liwc = Liwc('./liwc.dic')

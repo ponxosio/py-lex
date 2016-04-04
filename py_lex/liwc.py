@@ -7,16 +7,21 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input,
 
 import re
 import json
+import pickle
+
 from collections import Counter
-from itertools import tee
+from itertools import chain
 
-class Liwc(object):
+from py_lex.base import Base
+from py_lex.liwc_parser import LiwcParser
 
-    def __init__(self, liwc_filepath):
+class Liwc(Base):
+
+    def __init__(self, liwc_filepath=None):
 
         if liwc_filepath:
-            self.load_and_parse(liwc_filepath)
-
+            with open(liwc_filepath) as liwc_file:
+                self.parser = self.load_and_parse(liwc_file)
 
     '''
     Reads the LIWC file format:
@@ -29,28 +34,38 @@ class Liwc(object):
         abdomen*    146 147
         about   1   16  17
 
-    Returns a tuple of
-        * categories Set(categories) from dict(String: Int)
-        * stems dict(String: Set(categories))
-        * stems_to_categories dict(Stem: Set())
+    Returns a parser object that can tell the LIWC categories of a
+    given word efficiently.
     '''
+    def load_and_parse(self, liwc_file):
+        return LiwcParser(liwc_file.read().splitlines())
 
-    def read_token(self, token):
-        categories = set()
-        prefixes = self.stem_search_trie.prefixes(token)
+    '''
+    Inherited from base
 
-        if token in self.stem_lookup:
-            categories.add(self.stem_int_dict[token])
+    token: str -> Set(str)
+    '''
+    # def categorize_token(self, token):
 
-        if prefixes is not None:
-            for prefix in prefixes:
-                categories.add(self.stem_int_dict[prefix])
+    '''
+    Inherited from base
 
-        return categories
+    For each word string return a tuple (str, Set()) in place.
 
+    This is far less efficient than just counting them.
+    [
+        ['a', 'tokenized', 'sentence', '.'],
+        ['within', 'a', 'single', 'document', '.'],
+        ...
+    ]
+    ->
+    [
+        [('A', Set('pronoun')), ...],
+        ...
+    ]
+    doc: List[List[str]], ignore_sentences: Bool || True ->
+        List[List[(str, Set(str))]]
+    '''
+    # def annotate_doc(self, doc, ignore_sentences=False):
 
-    def load(self, pickle_filepath):
-        pass
-
-    def dump(self, pickle_filepath):
-        pass
+    # def summarize_doc(self, doc):
