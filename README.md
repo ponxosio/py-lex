@@ -1,4 +1,4 @@
-# Setup
+# `py-lex`
 
 Python and Javascript libraries packaged together here;
 mostly they are translations of each other, if both exist (as with LIWC, for example).
