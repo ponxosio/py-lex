@@ -72,7 +72,6 @@ class LiwcParser(object):
     def get_refs(self, key):
         categories = set()
         stems = self.stem_search_trie.prefixes(key)
-        print(stems)
 
         if key in self.direct_lookup_stems:
             categories |= self.stem_to_categories[key]

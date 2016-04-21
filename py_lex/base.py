@@ -50,15 +50,24 @@ class Base(object):
     doc: List[List[str]], ignore_sentences: Bool || True ->
         Counter(key, int)
     '''
-    def summarize_doc(self, doc, ignore_sentences=True):
+    def summarize_doc(self, doc):
         categorized_doc = self.categorize_doc(doc, ignore_sentences)
 
-        if ignore_sentences:
-            return Counter(list(
-                self._flatten_list_of_sets(categorized_doc)))
-        else:
-            return Counter(list(
-                self._flatten_list_of_list_of_sets(categorized_doc)))
+        # Strip punctuation for word counts
+        wc = len([w for w in doc if re.match('\w+', w)])
+
+        sixltr = sum(len(token) > 6 for token in tokens)
+
+        ctr = Counter(list(self._flatten_list_of_sets(categorized_doc)))
+        ctr['sixltr'] = sixltr
+
+        # convert to percentile dict
+        percent_dict = {k: v/wc for (k,v) in dict(ctr).items()}
+        percent_dict['wc'] = wc
+        percent_dict['analytic'] = self.analytic_thinking_score(percent_dict)
+        percent_dict['tone'] = self.emotional_tone_score(percent_dict)
+        percent_dict['authentic'] = self.authenticity_score(percent_dict)
+        return percent_dict
 
     def load(self, pickle_filepath):
         with open(pickle_filepath, 'rb') as pickle_file:
