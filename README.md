@@ -4,7 +4,7 @@ Python libraries for parsing and applying emotion, socio-psycho, and sentiment d
 
 ## Features
 
-Analyzes at the unigram token and document level.
+Analyzes at the unigram token of tokenized documents.
 
 Supports datasets of the form of LIWC, NRC EmoLex, and NRC SentiLex. This library itself doesn't include any of these datasets you must procure or create them on your own.
 
@@ -31,10 +31,13 @@ liwc.dump('./liwc.pickle')
 liwcP = Liwc()
 liwcP.load('./liwc.pickle')
 
-# Or manually parse the LIWC data
-liwc.load_and_parse('./liwc.dic')
+# tokenize your document of choice
+document = nltk.tokenize.casual.casual_tokenize(a_str_document)
 
-summary = liwc.summarizeDoc('some document to get a summary')
-annotation = liwc.annotateDoc('some document to get a detailed annotation')
-summary_of_annotation = liwc.summarizeAnnotation(annotation)
+summary = liwc.summarize_doc(document)
+annotation = liwc.annotate_doc(document)
+
+# faster if you need both, since summary creates an annotation
+# returns (annotation, summary) tuple
+(annotation, summary) = liwc.summarize_annotation(annotation)
 ```
