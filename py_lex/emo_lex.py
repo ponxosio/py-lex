@@ -7,7 +7,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input,
                       int, map, next, oct, open, pow, range, round,
                       str, super, zip)
 
-from collections import Counter
+from collections import Counter, ChainMap
 from itertools import chain
 import re
 
@@ -21,6 +21,12 @@ class EmoLex(object):
             with open(emolex_filepath) as emolex_file:
                 self.parser = self._load_and_parse(emolex_file)
 
+    def keys(self):
+        return self._parser_keys()
+
+    def _parser_keys(self):
+        return self.parser.keys
+
     def categorize_token(self, token):
         return self.parser[token.lower()]
 
@@ -31,13 +37,21 @@ class EmoLex(object):
         annotation = self.annotate_doc(doc)
 
         # return just the summarization
-        return self.summarize_annotation(annotation)[0]
+        return self.summarize_annotation(annotation, doc)
 
     def summarize_annotation(self, annotation, doc):
         wc = len([w for w in doc if re.match('\w+', w)])
-
         ctr = Counter(list(self._flatten_list_of_sets(annotation)))
-        return {k: float(v)/float(wc) for (k,v) in dict(ctr).items()}
+
+        # Convert to percentiles
+        summary = {k: float(v)/float(wc) for (k,v) in dict(ctr).items()}
+
+        # Set keys that did not occur to 0
+        not_counted = { k: 0.0 for k in
+                self._parser_keys() - set(summary.keys()) }
+
+        # Merge the two dictionaries
+        return dict(ChainMap(summary, not_counted))
 
     def load(self, pickle_filepath):
         with open(pickle_filepath, 'rb') as pickle_file:

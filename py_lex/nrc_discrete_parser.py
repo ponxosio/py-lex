@@ -17,7 +17,7 @@ class NrcDiscreteParser(object):
     liwc_lines: List[str] ->
     '''
     def __init__(self, nrc_lines):
-        self.parser = self._parse(nrc_lines)
+        (self.parser, self.keys) = self._parse(nrc_lines)
 
     '''
     self[key]
@@ -38,8 +38,11 @@ class NrcDiscreteParser(object):
         split_lines = [ line.split('\t') for line in nrc_lines ]
 
         output = defaultdict(set)
+        keys = set()
+
         for (token, attr, boolean) in split_lines:
+            keys |= set([attr])
             if int(boolean) is 1:
                 output[token] = output[token] | set([attr])
 
-        return output
+        return output, keys

@@ -1,2 +1,4 @@
 marisa-trie==0.7.2
 bidict==0.11.0
+nltk==3.2.1
+py-lex==0.1.0

@@ -30,11 +30,21 @@ class Liwc(object):
         ('otherp', '#$%&*+-/<=>@\\^_`|~'),
     ]
 
+    computed_keys = set([ 'wc', 'analytic', 'tone', 'authentic', 
+        'sixltr', 'numerals', 'allpct'])
+
     def __init__(self, liwc_filepath=None):
+        self.punct_keys = set([k for k,v in self.punctuation])
 
         if liwc_filepath:
             with open(liwc_filepath) as liwc_file:
                 self.parser = self._load_and_parse(liwc_file)
+
+    def keys(self):
+        return self.computed_keys | self.punct_keys | self._parser_keys()
+
+    def _parser_keys(self):
+        return self.parser.category_bidict.inv.keys()
 
     '''
     token: str -> Set(str)
@@ -45,37 +55,21 @@ class Liwc(object):
     '''
     For each word string return a tuple (str, Set()) in place.
 
-    [
-        ['a', 'tokenized', 'sentence', '.'],
-        ['within', 'a', 'single', 'document', '.'],
-        ...
-    ]
-    ->
-    [
-        [Set('pronoun'), ...],
-        ...
-    ]
-    doc: List[List[str]], ignore_sentences: Bool || True ->
-        List[List[Set(str)]]
+    ['a', 'tokenized', 'sentence', '.'] -> [Set('pronoun'), ...],
+
+    doc: List[List[str]] -> List[Set(str)]
     '''
-    def annotate_doc(self, doc, ignore_sentences=True):
-        if ignore_sentences:
-            return [ self.categorize_token(word.lower()) for word in doc ]
-        else:
-            return [ [ self.categorize_token(word.lower()) for word in sent ]
-                    for sent in doc ]
+    def annotate_doc(self, doc):
+        return [ self.categorize_token(word.lower()) for word in doc ]
 
     '''
-    @XXX does not support sentence level statistics yet
-
-    doc: List[List[str]], ignore_sentences: Bool || True ->
-        Counter(key, int)
+    doc: List[List[str]] -> Counter(key, int)
     '''
-    def summarize_doc(self, doc, ignore_sentences=True):
-        annotation = self.annotate_doc(doc, ignore_sentences)
+    def summarize_doc(self, doc):
+        annotation = self.annotate_doc(doc)
 
         # return just the summarization
-        return self.summarize_annotation(annotation)[0]
+        return self.summarize_annotation(annotation, doc)
 
     def summarize_annotation(self, annotation, doc):
         # Strip punctuation for word counts
@@ -88,19 +82,23 @@ class Liwc(object):
         ctr = Counter(list(self._flatten_list_of_sets(annotation)))
 
         # convert counts to percentile dict
-        percent_dict = {k: float(v)/float(wc) for (k,v) in dict(ctr).items()}
+        summary = {k: float(v)/float(wc) for (k,v) in dict(ctr).items()}
+
+        # Set keys that did not occur to 0
+        not_counted = { k: 0.0 for k in
+                self._parser_keys() - set(summary.keys()) }
 
         # add non-percentile measures
-        percent_dict['wc'] = wc
-        percent_dict['analytic'] = self.analytic_thinking_score(percent_dict)
-        percent_dict['tone'] = self.emotional_tone_score(percent_dict)
-        percent_dict['authentic'] = self.authenticity_score(percent_dict)
-        percent_dict['sixltr'] = sixltr
-        percent_dict['numerals'] = numerals
-        percent_dict['allpct'] = sum(punct_counts.values())
+        summary['wc'] = wc
+        summary['analytic'] = self.analytic_thinking_score(summary)
+        summary['tone'] = self.emotional_tone_score(summary)
+        summary['authentic'] = self.authenticity_score(summary)
+        summary['sixltr'] = sixltr
+        summary['numerals'] = numerals
+        summary['allpct'] = sum(punct_counts.values())
 
         # Merge the two dictionaries
-        return (annotation, dict(ChainMap(percent_dict, punct_counts)))
+        return dict(ChainMap(summary, not_counted, punct_counts))
 
     '''
     Where percentile_dict is a dict of percentiles of word per document
@@ -151,7 +149,7 @@ class Liwc(object):
                0.16 * (c['shehe'] + c['they']) + \
                -0.15 * c['negemo'] + \
                0.54 + c['excl'] + \
-               -0.2 + c['motion'] 
+               -0.2 + c['motion']
 
     '''
     Could not determine formula for clout from cited paper:

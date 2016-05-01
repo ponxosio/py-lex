@@ -21,23 +21,33 @@ pip install -r ./requirements.txt
 ## Usage
 
 ```Python
-import Liwc from lex
+from py_lex import Liwc, EmoLex
 
 # Instantiate reader from raw, local .dic file
-liwc = Liwc('./liwc.dic')
+lexicon = Liwc('./liwc.dic')
+# Or use an NRC EmoLex lexicon, which implements the same API
+# lexicon = EmoLex('./emo-lex.txt')
 
-# Or from a previously dumped file for faster instantiation (no parsing)
-liwc.dump('./liwc.pickle')
-liwcP = Liwc()
-liwcP.load('./liwc.pickle')
+# Or from a previously dumped file for slightly faster instantiation (no parsing)
+lexicon.dump('./lexicon.pickle')
+lexiconP = Liwc()
+lexiconP.load('./lexicon.pickle')
 
 # tokenize your document of choice
 document = nltk.tokenize.casual.casual_tokenize(a_str_document)
+# => List[str]
 
-summary = liwc.summarize_doc(document)
-annotation = liwc.annotate_doc(document)
+summary = lexicon.summarize_doc(document)
+# => Dict[str, Union[int, float]]
+# Where str is the LIWC/EmoLex key
 
-# faster if you need both, since summary creates an annotation
-# returns (annotation, summary) tuple
-(annotation, summary) = liwc.summarize_annotation(annotation)
+annotation = lexicon.annotate_doc(document)
+# => List[Set[str]]
+# Where each index aligns with the input List of words and str is the
+# LIWC/EmoLex key for easy zipping.
+
+# faster if you need both, since summarize_doc creates an annotation internally
+summary = lexicon.summarize_annotation(annotation)
+# => Dict[str, Union[int, float]]
+# Where str is the LIWC/EmoLex key
 ```
