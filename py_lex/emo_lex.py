@@ -10,6 +10,7 @@ from builtins import (ascii, bytes, chr, dict, filter, hex, input,
 from collections import Counter, ChainMap
 from itertools import chain
 import re
+import pickle
 
 from py_lex.nrc_discrete_parser import NrcDiscreteParser
 
