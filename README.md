@@ -50,4 +50,12 @@ annotation = lexicon.annotate_doc(document)
 summary = lexicon.summarize_annotation(annotation)
 # => Dict[str, Union[int, float]]
 # Where str is the LIWC/EmoLex key
+
+# Get the set of keys being used by the given lexicon
+lexicon.keys()
+# => Set[str]
+
+# Get the number of keys that the given lexicon will compute
+len(lexicon)
+# => int # 82
 ```

@@ -21,6 +21,9 @@ class EmoLex(object):
             with open(emolex_filepath) as emolex_file:
                 self.parser = self._load_and_parse(emolex_file)
 
+    def __len__(self):
+        return len(self.keys())
+
     def keys(self):
         return self._parser_keys()
 

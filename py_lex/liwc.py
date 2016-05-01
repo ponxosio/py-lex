@@ -40,6 +40,9 @@ class Liwc(object):
             with open(liwc_filepath) as liwc_file:
                 self.parser = self._load_and_parse(liwc_file)
 
+    def __len__(self):
+        return len(self.keys())
+
     def keys(self):
         return self.computed_keys | self.punct_keys | self._parser_keys()
 
