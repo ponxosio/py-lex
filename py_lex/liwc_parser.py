@@ -52,13 +52,6 @@ class LiwcParser(object):
         self.stem_search_trie) = self._parse(liwc_lines)
 
     '''
-    len(self)
-    -> int
-    '''
-    def __len__(self):
-        pass
-
-    '''
     self[key]
     key: str -> Set[str]
     '''

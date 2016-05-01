@@ -27,7 +27,7 @@ class Liwc(object):
         ('quote', '"'),  # “”
         ('apostro', "'"),  # ‘’
         ('parenth', '()[]{}'),
-        ('otherp', '#$%&*+-/<=>@\\^_`|~')
+        ('otherp', '#$%&*+-/<=>@\\^_`|~'),
     ]
 
     def __init__(self, liwc_filepath=None):
@@ -35,6 +35,7 @@ class Liwc(object):
         if liwc_filepath:
             with open(liwc_filepath) as liwc_file:
                 self.parser = self._load_and_parse(liwc_file)
+
     '''
     token: str -> Set(str)
     '''
@@ -76,15 +77,15 @@ class Liwc(object):
         # return just the summarization
         return self.summarize_annotation(annotation)[0]
 
-    def summarize_annotation(self, annotation):
+    def summarize_annotation(self, annotation, doc):
         # Strip punctuation for word counts
-        wc = len([w for w in annotation if re.match('\w+', w)])
+        wc = len([w for w in doc if re.match('\w+', w)])
 
-        sixltr = sum(len(token) > 6 for token in annotation)
-        numerals = sum(token.isdigit() for token in annotation)
-        punct_counts = self._count_punctuation(annotation)
+        sixltr = sum(len(token) > 6 for token in doc)
+        numerals = sum(token.isdigit() for token in doc)
+        punct_counts = self._count_punctuation(doc)
 
-        ctr = Counter(list(self._flatten_list_of_sets(categorized_doc)))
+        ctr = Counter(list(self._flatten_list_of_sets(annotation)))
 
         # convert counts to percentile dict
         percent_dict = {k: float(v)/float(wc) for (k,v) in dict(ctr).items()}
