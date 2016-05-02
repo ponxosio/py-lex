@@ -1,6 +1,6 @@
 # `py-lex`
 
-Python libraries for parsing and applying emotion, socio-psycho, and sentiment datasets to your own text corpora.
+Python library for parsing and applying emotion, socio-psycho, and sentiment datasets to your own text corpora.
 
 ## Usage
 
