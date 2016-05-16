@@ -10,7 +10,7 @@ Analyzes at the unigram token of tokenized documents.
 Supports datasets of the form of LIWC 2007 dictinoary and NRC EmoLex. This library itself doesn't include any of these datasets you must procure or create them on your own.
 
 * The LIWC 2007 dictionary can be purchased from [their website](http://liwc.wpengine.com/). Other documents that follow the LIWC file format will also work.
-* The NRC EmoLex lexicon can be downloaded for free for research purposes from [their website](http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm).
+* The NRC EmoLex lexicon can be downloaded for free for research purposes from [their website](http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm). Currently it does not support stripping the header information, so you will need to delete that.
 
 Legal note: using the actual LIWC dataset outside of the application may be a violation of their terms of service. NRC datasets are free to use for research purposes, but require permission for commercial uses.
 
