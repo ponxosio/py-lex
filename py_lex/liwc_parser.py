@@ -71,7 +71,11 @@ class LiwcParser(object):
 
         if stems is not None:
             for stem in stems:
-                categories |= self.stem_to_categories[stem]
+                if stem in self.stem_to_categories:
+                    categories |= self.stem_to_categories[stem]
+                else:
+                    raise Exception("for key {2} stem {0} is not in stem to categories: {1}"
+                                    .format(stem, self.stem_to_categories, key))
 
         return categories
 
@@ -120,15 +124,33 @@ class LiwcParser(object):
     category_lines: List[List[str, str]] -> Bidict
     '''
     def _build_category_ref_bidict(self, category_lines):
-        return frozenbidict({ int(cat[0]):cat[1] for cat in category_lines })
+        d = {}
+        try:
+            for cat in category_lines:
+                if len(cat) > 1 and cat[0].isdigit():
+                    d[int(cat[0])] = cat[1]
+            return frozenbidict(d)
+        except Exception as e:
+            raise Exception("category line {0} raise the exception: {1}".format(cat, e))
 
     '''
     [['stem*', '1', '3', ...], ...] ->
     { 'stem': set([1, 3, ...]), ...}
     '''
     def _build_stem_cat_dict(self, stem_lines):
-        return { stem[0].rstrip('*'): set(int(x) for x in stem[1:])
-                    for stem in stem_lines }
+        try:
+            d = {}
+            for stem in stem_lines:
+                word_index = 0
+                word = ""
+                while not stem[word_index].isdigit():
+                    word += stem[word_index]
+                    word_index += 1
+
+                d[word.rstrip('*')] = set(int(x) for x in stem[word_index:])
+            return d
+        except Exception as e:
+            raise Exception("stem line {0} raise exception: {1}".format(stem, e))
 
     '''
     Separate simple word lookup (where we can use a dictionary directly) from
@@ -139,11 +161,19 @@ class LiwcParser(object):
     '''
     def _build_stem_key_lists(self, stem_lines):
         stems, keys = [], []
-        endswith_star = lambda s: str.endswith(s, '*')
         
         for stem in stem_lines:
-            (stems if endswith_star(stem[0]) else keys) \
-                .append(stem[0].rstrip('*'))
+            word_index = 0
+            word = ""
+            while not stem[word_index].isdigit():
+                word += stem[word_index] + " "
+                word_index += 1
+            word = word.strip()
+
+            if word.endswith('*'):
+                stems.append(word.rstrip('*'))
+            else:
+                keys.append(word)
 
         return set(stems), set(keys)
     
